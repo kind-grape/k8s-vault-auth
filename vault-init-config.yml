@@ -1,0 +1,85 @@
+apiVersion: v1
+data:
+  config-init.hcl: |
+    exit_after_auth = true
+    pid_file = "/home/vault/pidfile"
+
+    auto_auth {
+        method "kubernetes" {
+            mount_path = "auth/px-npe1101"
+            config = {
+                role = "appapoc"
+            }
+        }
+
+        sink "file" {
+            config = {
+                path = "/home/vault/.token"
+            }
+        }
+    }
+
+    vault {
+      address = "https://vault-dev.npe-services.t-mobile.com"
+      ca_cert = "/vault/tls/ca.crt"
+      renew_token = true
+      vault_agent_token_file = "/home/vault/.token"
+      retry {
+        backoff = "1s"
+      }
+    }
+
+    template {
+      destination = "/vault/secrets/config.env"
+      contents = <<EOH
+    {{- with secret "kubernetes-test/appa" }}
+    FOO={{.Data.data.foo}}
+    OKEY={{.Data.data.okey}}
+    ICE={{.Data.data.ice}}
+    {{end}}
+    EOH
+    }
+
+  config.hcl: |
+    exit_after_auth = false
+    pid_file = "/home/vault/pidfile"
+
+    auto_auth {
+        method "kubernetes" {
+            mount_path = "auth/px-npe1101"
+            config = {
+                role = "appapoc"
+            }
+        }
+
+        sink "file" {
+            config = {
+                path = "/home/vault/.token"
+            }
+        }
+    }
+
+    vault {
+      address = "https://vault-dev.npe-services.t-mobile.com"
+      ca_cert = "/vault/tls/ca.crt"
+      renew_token = true
+      vault_agent_token_file = "/home/vault/.token"
+      retry {
+        backoff = "1s"
+      }
+    }
+
+    template {
+      destination = "/vault/secrets/config.env"
+      contents = <<EOH
+    {{- with secret "kubernetes-test/appa" }}
+    FOO={{.Data.data.foo}}
+    OKEY={{.Data.data.okey}}
+    ICE={{.Data.data.ice}}
+    {{end}}
+    EOH
+    }
+kind: ConfigMap
+metadata:
+  name: vault-init-config
+  namespace: tev-dev
