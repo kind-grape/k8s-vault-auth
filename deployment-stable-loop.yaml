@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellogo-dep-loop
+  labels:
+    app: hellogo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hellogo
+  template:
+    metadata:
+      labels:
+        app: hellogo
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-configmap: "vault-init-config-loop"
+        vault.hashicorp.com/tls-secret: "tmo-root-ca"
+    spec:
+      serviceAccountName: svc-tke-tevdev
+      containers:
+        - name: hellogo
+          image: harbor.geo.pks.t-mobile.com/test/hellogo:v1.0
+          ports:
+          - name: hellogo
+            containerPort: 8080
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "100m"
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+          env:
+          - name: TKE_CLUSTER
+            value: 'px-npe1101'
