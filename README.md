@@ -49,7 +49,7 @@ kubectl get secret svc-tke-tevdev-token-4w6qw -o jsonpath="{.data['ca\.crt']}" |
 ```text
 $ vault write auth/kubernetes/config \
     token_reviewer_jwt="<your reviewer service account JWT>" \
-    kubernetes_host=https://192.168.99.100:<your TCP port or blank for 443> \
+    kubernetes_host=https://<k8s_host>:<your TCP port or blank for 443> \
     kubernetes_ca_cert=@ca.crt
 ```
 
@@ -58,7 +58,7 @@ After configuring the auth method, Vault team would then need to create a role w
 ```text
 vault write auth/kubernetes/role/demo \
     bound_service_account_names=svc-tke-tevdev \
-    bound_service_account_namespaces=svc-tke-tevdev \
+    bound_service_account_namespaces=tev-dev \
     policies=appa-kv-ro \
     ttl=1h
 ```
