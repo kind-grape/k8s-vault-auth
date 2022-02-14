@@ -16,9 +16,9 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-configmap: "vault-init-config"
-        vault.hashicorp.com/tls-secret: "tmo-root-ca"
+        #vault.hashicorp.com/tls-secret: "tmo-root-ca"
     spec:
-      serviceAccountName: svc-tke-tevdev
+      serviceAccountName: vault-osjv
       containers:
         - name: hellogo
           image: harbor.geo.pks.t-mobile.com/test/hellogo:v1.0
@@ -32,6 +32,3 @@ spec:
             requests:
               memory: "100Mi"
               cpu: "50m"
-          env:
-          - name: TKE_CLUSTER
-            value: 'px-npe1101'

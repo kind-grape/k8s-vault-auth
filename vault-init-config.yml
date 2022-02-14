@@ -6,9 +6,9 @@ data:
 
     auto_auth {
         method "kubernetes" {
-            mount_path = "auth/px-npe1101"
+            mount_path = "kubernetes"
             config = {
-                role = "appapoc"
+                role = "osjv"
             }
         }
 
@@ -20,8 +20,9 @@ data:
     }
 
     vault {
-      address = "https://vault-dev.npe-services.t-mobile.com"
-      ca_cert = "/vault/tls/ca.crt"
+      address = http:{{ ip_here }}/{{ port }}"
+      #ca_cert = "/vault/tls/ca.crt"
+      tls_skip_verify = "true"
       renew_token = true
       vault_agent_token_file = "/home/vault/.token"
       retry {
@@ -32,11 +33,18 @@ data:
     template {
       destination = "/vault/secrets/config.env"
       contents = <<EOH
-    {{- with secret "kubernetes-test/appa" }}
-    FOO={{.Data.data.foo}}
-    OKEY={{.Data.data.okey}}
-    ICE={{.Data.data.ice}}
+    {{- with secret "services/data/dev/osjv" }}
+    inbound.jv.wss.passwords={{.Data.data.inbound.jv.wss.passwords}}
+    inbound.jv.wss.usernames={{.Data.data.inbound.jv.wss.usernames}}
+    inbound.jvbatch.ftp.password={{.Data.data.inbound.jvbatch.ftp.password}}
+    inbound.jvbatch.ftp.username={{.Data.data.inbound.jvbatch.ftp.username}}
+    inbound.jveo.wss.usernames={{.Data.data.inbound.jveo.wss.usernames}}
+    inbound_jveo_wss_passwords={{.Data.data.inbound_jveo_wss_passwords}}
+    weblogic.password={{.Data.data.weblogic.password}}
+    weblogic.username={{.Data.data.weblogic.username}}
     {{end}}
+    {- with secret "services/data/common" }}
+    default_non_prod_secret={{.Data.data.default_non_prod_secret}}
     EOH
     }
 
@@ -46,9 +54,9 @@ data:
 
     auto_auth {
         method "kubernetes" {
-            mount_path = "auth/px-npe1101"
+            mount_path = "kubernetes"
             config = {
-                role = "appapoc"
+                role = "osjv"
             }
         }
 
@@ -60,8 +68,9 @@ data:
     }
 
     vault {
-      address = "https://vault-dev.npe-services.t-mobile.com"
-      ca_cert = "/vault/tls/ca.crt"
+      address = http:{{ ip_here }}/{{ port }}"
+      #ca_cert = "/vault/tls/ca.crt"
+      tls_skip_verify = "true"
       renew_token = true
       vault_agent_token_file = "/home/vault/.token"
       retry {
@@ -72,11 +81,18 @@ data:
     template {
       destination = "/vault/secrets/config.env"
       contents = <<EOH
-    {{- with secret "kubernetes-test/appa" }}
-    FOO={{.Data.data.foo}}
-    OKEY={{.Data.data.okey}}
-    ICE={{.Data.data.ice}}
+    {{- with secret "services/data/dev/osjv" }}
+    inbound.jv.wss.passwords={{.Data.data.inbound.jv.wss.passwords}}
+    inbound.jv.wss.usernames={{.Data.data.inbound.jv.wss.usernames}}
+    inbound.jvbatch.ftp.password={{.Data.data.inbound.jvbatch.ftp.password}}
+    inbound.jvbatch.ftp.username={{.Data.data.inbound.jvbatch.ftp.username}}
+    inbound.jveo.wss.usernames={{.Data.data.inbound.jveo.wss.usernames}}
+    inbound_jveo_wss_passwords={{.Data.data.inbound_jveo_wss_passwords}}
+    weblogic.password={{.Data.data.weblogic.password}}
+    weblogic.username={{.Data.data.weblogic.username}}
     {{end}}
+    {- with secret "services/data/common" }}
+    default_non_prod_secret={{.Data.data.default_non_prod_secret}}
     EOH
     }
 kind: ConfigMap
