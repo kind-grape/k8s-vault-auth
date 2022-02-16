@@ -6,9 +6,10 @@ data:
 
     auto_auth {
         method "kubernetes" {
-            mount_path = "kubernetes"
+            mount_path = "auth/kubernetes"
             config = {
                 role = "osjv"
+                #token_path = "{path/to/jwt}"
             }
         }
 
@@ -34,14 +35,14 @@ data:
       destination = "/vault/secrets/config.env"
       contents = <<EOH
     {{- with secret "services/data/dev/osjv" }}
-    inbound.jv.wss.passwords={{.Data.data.inbound.jv.wss.passwords}}
-    inbound.jv.wss.usernames={{.Data.data.inbound.jv.wss.usernames}}
-    inbound.jvbatch.ftp.password={{.Data.data.inbound.jvbatch.ftp.password}}
-    inbound.jvbatch.ftp.username={{.Data.data.inbound.jvbatch.ftp.username}}
-    inbound.jveo.wss.usernames={{.Data.data.inbound.jveo.wss.usernames}}
-    inbound_jveo_wss_passwords={{.Data.data.inbound_jveo_wss_passwords}}
-    weblogic.password={{.Data.data.weblogic.password}}
-    weblogic.username={{.Data.data.weblogic.username}}
+    inbound.jv.wss.passwords={{ index .Data.data "inbound.jv.wss.passwords"}}
+    inbound.jv.wss.usernames={{ index .Data.data "inbound.jv.wss.usernames"}}
+    inbound.jvbatch.ftp.password={{ index .Data.data "inbound.jvbatch.ftp.password"}}
+    inbound.jvbatch.ftp.username={{ index .Data.data "inbound.jvbatch.ftp.username"}}
+    inbound.jveo.wss.usernames={{ index  .Data.data "inbound.jveo.wss.usernames"}}
+    inbound_jveo_wss_passwords={{ .Data.data.inbound_jveo_wss_passwords}}
+    weblogic.password={{ index .Data.data "weblogic.password"}}
+    weblogic.username={{ index .Data.data "weblogic.username"}}
     {{end}}
     {- with secret "services/data/common" }}
     default_non_prod_secret={{.Data.data.default_non_prod_secret}}
@@ -54,7 +55,7 @@ data:
 
     auto_auth {
         method "kubernetes" {
-            mount_path = "kubernetes"
+            mount_path = "auth/kubernetes"
             config = {
                 role = "osjv"
             }
