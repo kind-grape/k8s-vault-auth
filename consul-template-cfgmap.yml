@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: osjv
+    osjv.kubernetes.io/name: osjv-consul-template
+    branches: "true"
+  name: osjv-consul-template
+data:
+  config.hcl: |
+    vault {
+      address = "http://hostname:port"
+      token = ""
+      # vault_agent_token_file = "/tmp/vault/agent/token" -> use vault agent in conjunction to get token file instead
+      ssl {
+        verify = false
+      }
+      retry {
+        backoff = "1s"
+      }
+    }
+
+    consul {
+      address = "http://hostname:port"
+      ssl {
+        verify = false
+      }
+      retry {
+        backoff = "1s"
+      }
+    }
+
+    template {
+      destination = "/vault/secrets/config.env"
+      contents = <<EOH
+    {{- with secret "services/data/dev/osjv" }}
+    inbound.jv.wss.passwords={{ index .Data.data "inbound.jv.wss.passwords"}}
+    inbound.jv.wss.usernames={{ index .Data.data "inbound.jv.wss.usernames"}}
+    inbound.jvbatch.ftp.password={{ index .Data.data "inbound.jvbatch.ftp.password"}}
+    inbound.jvbatch.ftp.username={{ index .Data.data "inbound.jvbatch.ftp.username"}}
+    inbound.jveo.wss.usernames={{ index  .Data.data "inbound.jveo.wss.usernames"}}
+    inbound_jveo_wss_passwords={{ .Data.data.inbound_jveo_wss_passwords}}
+    weblogic.password={{ index .Data.data "weblogic.password"}}
+    weblogic.username={{ index .Data.data "weblogic.username"}}
+    {{end}}
+    {- with secret "services/data/common" }}
+    default_non_prod_secret={{.Data.data.default_non_prod_secret}}
+    EOH
+
+    ###
+    add consul template here 
+    ###
+
+    }
